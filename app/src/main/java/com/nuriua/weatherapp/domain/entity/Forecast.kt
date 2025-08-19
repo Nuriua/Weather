@@ -1,6 +1,6 @@
 package com.nuriua.weatherapp.domain.entity
 
-data class ForeCast(
+data class Forecast(
     val currentWeather: Weather,
     val upcoming: List<Weather>
 )
