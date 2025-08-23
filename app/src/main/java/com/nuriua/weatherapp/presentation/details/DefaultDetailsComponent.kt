@@ -6,17 +6,20 @@ import com.arkivanov.mvikotlin.extensions.coroutines.stateFlow
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.nuriua.weatherapp.domain.entity.City
 import com.nuriua.weatherapp.presentation.extensions.componentScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class DefaultDetailsComponent @Inject constructor(
-    private val city: City,
+class DefaultDetailsComponent @AssistedInject constructor(
     private var storeFactory: DetailsStoreFactory,
-    private val onBackClicked: () -> Unit,
-    componentContext: ComponentContext
+    @Assisted("city") private val city: City,
+    @Assisted("onBackClicked") private val onBackClicked: () -> Unit,
+    @Assisted("componentContext") componentContext: ComponentContext
 ) : DetailsComponent, ComponentContext by componentContext {
 
     private val store = instanceKeeper.getStore { storeFactory.create(city) }
@@ -43,5 +46,15 @@ class DefaultDetailsComponent @Inject constructor(
 
     override fun onClickBack() {
         store.accept(DetailsStore.Intent.ClickBack)
+    }
+
+    @AssistedFactory
+    interface Factory {
+
+        fun create(
+            @Assisted("city") city: City,
+            @Assisted("onBackClicked") onBackClicked: () -> Unit,
+            @Assisted("componentContext") componentContext: ComponentContext
+        ): DefaultDetailsComponent
     }
 }

@@ -9,7 +9,7 @@ interface FavouriteComponent {
 
     fun onClickSearch()
 
-    fun onClickAddFavourite()
+    fun onCLickAddFavourite()
 
-    fun onCityItemClicked(city: City)
+    fun onCityItemClick(city: City)
 }
