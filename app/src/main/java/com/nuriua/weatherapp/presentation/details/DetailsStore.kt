@@ -16,13 +16,13 @@ import com.nuriua.weatherapp.presentation.details.DetailsStore.State
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
- interface DetailsStore : Store<Intent, State, Label> {
+interface DetailsStore : Store<Intent, State, Label> {
 
     sealed interface Intent {
 
-        data object ClickBack: Intent
+        data object ClickBack : Intent
 
-        data object ClickChangeFavouriteStatus: Intent
+        data object ClickChangeFavouriteStatus : Intent
     }
 
     data class State(
@@ -33,23 +33,23 @@ import javax.inject.Inject
 
         sealed interface ForecastState {
 
-            data object Initial: ForecastState
+            data object Initial : ForecastState
 
-            data object Loading: ForecastState
+            data object Loading : ForecastState
 
-            data object Error: ForecastState
+            data object Error : ForecastState
 
-            data class Loaded(val forecast: Forecast): ForecastState
+            data class Loaded(val forecast: Forecast) : ForecastState
         }
     }
 
     sealed interface Label {
 
-        data object ClickBack: Label
+        data object ClickBack : Label
     }
 }
 
- class DetailsStoreFactory @Inject constructor(
+class DetailsStoreFactory @Inject constructor(
     private val storeFactory: StoreFactory,
     private val getForecastUseCase: GetForecastUseCase,
     private val changeFavouriteStateUseCase: ChangeFavouriteStateUseCase,
@@ -71,30 +71,29 @@ import javax.inject.Inject
 
     private sealed interface Action {
 
-        data class FavouriteStatusChanged(val isFavourite: Boolean): Action
+        data class FavouriteStatusChanged(val isFavourite: Boolean) : Action
 
-        data class ForecastLoaded(val forecast: Forecast): Action
+        data class ForecastLoaded(val forecast: Forecast) : Action
 
-        data object ForecastStartLoading: Action
+        data object ForecastStartLoading : Action
 
-        data object ForecastLoadingError: Action
+        data object ForecastLoadingError : Action
     }
 
     private sealed interface Msg {
 
-        data class FavouriteStatusChanged(val isFavourite: Boolean): Msg
+        data class FavouriteStatusChanged(val isFavourite: Boolean) : Msg
 
-        data class ForecastLoaded(val forecast: Forecast): Msg
+        data class ForecastLoaded(val forecast: Forecast) : Msg
 
-        data object ForecastStartLoading: Msg
+        data object ForecastStartLoading : Msg
 
-        data object ForecastLoadingError: Msg
+        data object ForecastLoadingError : Msg
     }
 
     private inner class BootstrapperImpl(
         private val city: City
     ) : CoroutineBootstrapper<Action>() {
-
         override fun invoke() {
             scope.launch {
                 observeFavouriteStateUseCase(city.id).collect {
@@ -115,10 +114,11 @@ import javax.inject.Inject
 
     private inner class ExecutorImpl : CoroutineExecutor<Intent, Action, State, Msg, Label>() {
         override fun executeIntent(intent: Intent, getState: () -> State) {
-            when(intent) {
+            when (intent) {
                 Intent.ClickBack -> {
                     publish(Label.ClickBack)
                 }
+
                 Intent.ClickChangeFavouriteStatus -> {
                     scope.launch {
                         val state = getState()
@@ -133,7 +133,7 @@ import javax.inject.Inject
         }
 
         override fun executeAction(action: Action, getState: () -> State) {
-            when(action) {
+            when (action) {
                 is Action.FavouriteStatusChanged -> {
                     dispatch(Msg.FavouriteStatusChanged(action.isFavourite))
                 }
@@ -154,16 +154,19 @@ import javax.inject.Inject
     }
 
     private object ReducerImpl : Reducer<State, Msg> {
-        override fun State.reduce(msg: Msg): State = when(msg) {
+        override fun State.reduce(msg: Msg): State = when (msg) {
             is Msg.FavouriteStatusChanged -> {
-                copy(isFavourite = isFavourite)
+                copy(isFavourite = msg.isFavourite)
             }
+
             is Msg.ForecastLoaded -> {
                 copy(forecastState = State.ForecastState.Loaded(msg.forecast))
             }
+
             Msg.ForecastLoadingError -> {
                 copy(forecastState = State.ForecastState.Error)
             }
+
             Msg.ForecastStartLoading -> {
                 copy(forecastState = State.ForecastState.Loading)
             }
