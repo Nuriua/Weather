@@ -44,7 +44,7 @@ interface FavouriteStore : Store<Intent, State, Label> {
 
             data class Loaded(
                 val tempC: Float,
-                val icon: String
+                val iconUrl: String
             ) : WeatherState
         }
     }
